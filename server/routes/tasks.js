@@ -20,8 +20,21 @@ const auth = (req, res, next) => {
 };
 
 router.get('/', auth, (req, res) => {
-  const userTasks = tasks.filter(t => t.userId === req.user.id);
-  res.json(userTasks);
+  try {
+    // Validate user exists
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Invalid user session' });
+    }
+    
+    const userTasks = tasks.filter(t => t.userId === req.user.id);
+    
+    // Add cache headers
+    res.set('Cache-Control', 'private, max-age=300'); // 5 min cache
+    res.json(userTasks);
+  } catch (err) {
+    console.error('Error fetching tasks:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 //before
