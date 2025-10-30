@@ -24,6 +24,8 @@ jobs:
         sudo apt-get install -y chromium-browser
 
     - name: Backend - Install & Test
+      env:
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
       run: |
         cd server
         npm ci
