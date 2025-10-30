@@ -19,7 +19,8 @@
     "build": "react-scripts build",
     "test": "jest",
     "eject": "react-scripts eject",
-    "test:ui": "jest --testMatch='**/*.test.js'"
+    "test:ui": "jest --testMatch='**/*.test.js'",
+    "test:selenium": "jest --testMatch='**/selenium/*.test.selenium.js'"
   },
   "eslintConfig": {
     "extends": [

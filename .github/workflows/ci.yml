@@ -1,4 +1,4 @@
-name: CI Pipeline - Build & Test
+name: CI/CD Pipeline
 
 on:
   push:
@@ -11,24 +11,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4  # Clone repo
+    - uses: actions/checkout@v4
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'  # Node version
+        node-version: '20'
 
-    - name: Backend Build & Test
+    - name: Install Chrome for Selenium
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-browser
+
+    - name: Backend - Install & Test
       run: |
         cd server
         npm ci
-        npm test -- --coverage
+        npm test
+        npm run test:api
 
-    - name: Frontend Build & Test
+    - name: Frontend - Install & Test
       run: |
         cd client
         npm ci
         npm test
+        npm run test:ui
+
+    - name: Run Selenium Tests
+      run: |
+        cd client
+        npm run test:selenium
+
+    - name: Build Frontend
+      run: |
+        cd client
+        npm run build
 
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
@@ -36,7 +53,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - name: Upload Test Reports (if fail)
+    - name: Upload Test Reports
       if: always()
       uses: actions/upload-artifact@v4
       with:
